@@ -3,16 +3,21 @@ package com.kaoyan408.controller;
 import com.kaoyan408.common.PageResult;
 import com.kaoyan408.common.Result;
 import com.kaoyan408.dto.AiConfigDTO;
+import com.kaoyan408.dto.CodingProblemDTO;
+import com.kaoyan408.dto.CodingTestCaseDTO;
 import com.kaoyan408.dto.CourseDTO;
 import com.kaoyan408.dto.KnowledgePointDTO;
 import com.kaoyan408.dto.QuestionDTO;
 import com.kaoyan408.entity.AiConfig;
+import com.kaoyan408.entity.CodingProblem;
+import com.kaoyan408.entity.CodingTestCase;
 import com.kaoyan408.entity.Course;
 import com.kaoyan408.entity.KnowledgePoint;
 import com.kaoyan408.entity.Question;
 import com.kaoyan408.entity.User;
 import com.kaoyan408.service.AdminService;
 import com.kaoyan408.service.AiService;
+import com.kaoyan408.service.CodingProblemService;
 import com.kaoyan408.service.CourseService;
 import com.kaoyan408.service.KnowledgePointService;
 import com.kaoyan408.service.QuestionService;
@@ -42,6 +47,7 @@ public class AdminController {
     private final KnowledgePointService knowledgePointService;
     private final QuestionService questionService;
     private final AiService aiService;
+    private final CodingProblemService codingProblemService;
 
     // ---------- 数据看板 ----------
     @GetMapping("/dashboard")
@@ -147,6 +153,49 @@ public class AdminController {
     @DeleteMapping("/questions/{id}")
     public Result<Void> deleteQuestion(@PathVariable Long id) {
         questionService.delete(id);
+        return Result.ok();
+    }
+
+    // ---------- 算法题管理 ----------
+    @GetMapping("/coding/problems")
+    public Result<List<CodingProblem>> codingProblems() {
+        return Result.ok(codingProblemService.listAll());
+    }
+
+    @PostMapping("/coding/problems")
+    public Result<CodingProblem> createCodingProblem(@Valid @RequestBody CodingProblemDTO dto) {
+        return Result.ok(codingProblemService.create(dto));
+    }
+
+    @PutMapping("/coding/problems/{id}")
+    public Result<CodingProblem> updateCodingProblem(@PathVariable Long id, @Valid @RequestBody CodingProblemDTO dto) {
+        return Result.ok(codingProblemService.update(id, dto));
+    }
+
+    @DeleteMapping("/coding/problems/{id}")
+    public Result<Void> deleteCodingProblem(@PathVariable Long id) {
+        codingProblemService.delete(id);
+        return Result.ok();
+    }
+
+    @GetMapping("/coding/test-cases")
+    public Result<List<CodingTestCase>> codingTestCases(@RequestParam Long problemId) {
+        return Result.ok(codingProblemService.listTestCases(problemId));
+    }
+
+    @PostMapping("/coding/test-cases")
+    public Result<CodingTestCase> createCodingTestCase(@Valid @RequestBody CodingTestCaseDTO dto) {
+        return Result.ok(codingProblemService.createTestCase(dto));
+    }
+
+    @PutMapping("/coding/test-cases/{id}")
+    public Result<CodingTestCase> updateCodingTestCase(@PathVariable Long id, @Valid @RequestBody CodingTestCaseDTO dto) {
+        return Result.ok(codingProblemService.updateTestCase(id, dto));
+    }
+
+    @DeleteMapping("/coding/test-cases/{id}")
+    public Result<Void> deleteCodingTestCase(@PathVariable Long id) {
+        codingProblemService.deleteTestCase(id);
         return Result.ok();
     }
 

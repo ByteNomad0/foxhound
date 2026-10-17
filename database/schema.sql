@@ -146,3 +146,59 @@ CREATE TABLE ai_chat_record (
     PRIMARY KEY (id),
     KEY idx_user (user_id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='AI对话记录表';
+
+-- ----------------------------
+-- 算法题表（复试机试）
+-- ----------------------------
+DROP TABLE IF EXISTS coding_problem;
+CREATE TABLE coding_problem (
+    id              BIGINT       NOT NULL AUTO_INCREMENT COMMENT '主键',
+    title           VARCHAR(200) NOT NULL COMMENT '题目标题',
+    description     TEXT         NOT NULL COMMENT '题目描述',
+    difficulty      VARCHAR(20)  NOT NULL DEFAULT 'EASY' COMMENT '难度：EASY/MEDIUM/HARD',
+    tags            VARCHAR(200) DEFAULT NULL COMMENT '标签，逗号分隔',
+    time_limit_ms   INT          NOT NULL DEFAULT 3000 COMMENT '时间限制(毫秒)',
+    memory_limit_mb INT          NOT NULL DEFAULT 256 COMMENT '内存限制(MB)',
+    sample_input    TEXT         COMMENT '样例输入',
+    sample_output   TEXT         COMMENT '样例输出',
+    status          TINYINT      NOT NULL DEFAULT 1 COMMENT '状态：1启用 0禁用',
+    created_at      DATETIME     DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_at      DATETIME     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (id)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='算法题表';
+
+-- ----------------------------
+-- 算法题测试用例表
+-- ----------------------------
+DROP TABLE IF EXISTS coding_test_case;
+CREATE TABLE coding_test_case (
+    id              BIGINT   NOT NULL AUTO_INCREMENT COMMENT '主键',
+    problem_id      BIGINT   NOT NULL COMMENT '所属题目',
+    input           TEXT     COMMENT '输入',
+    expected_output TEXT     COMMENT '期望输出',
+    is_sample       TINYINT  NOT NULL DEFAULT 0 COMMENT '是否样例：1是 0否（隐藏用例）',
+    sort            INT      NOT NULL DEFAULT 0 COMMENT '排序',
+    PRIMARY KEY (id),
+    KEY idx_problem (problem_id)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='算法题测试用例表';
+
+-- ----------------------------
+-- 算法题提交记录表
+-- ----------------------------
+DROP TABLE IF EXISTS coding_submission;
+CREATE TABLE coding_submission (
+    id           BIGINT      NOT NULL AUTO_INCREMENT COMMENT '主键',
+    user_id      BIGINT      NOT NULL COMMENT '用户',
+    problem_id   BIGINT      NOT NULL COMMENT '题目',
+    language     VARCHAR(20) NOT NULL COMMENT '语言：JAVA/JAVASCRIPT/PYTHON/CPP/C',
+    code         TEXT        NOT NULL COMMENT '代码',
+    status       VARCHAR(30) COMMENT '判题状态',
+    passed_count INT         NOT NULL DEFAULT 0 COMMENT '通过用例数',
+    total_count  INT         NOT NULL DEFAULT 0 COMMENT '总用例数',
+    detail       TEXT        COMMENT '判题详情/错误信息',
+    time_ms      INT         COMMENT '运行耗时(毫秒)',
+    created_at   DATETIME    DEFAULT CURRENT_TIMESTAMP COMMENT '提交时间',
+    PRIMARY KEY (id),
+    KEY idx_user (user_id),
+    KEY idx_problem (problem_id)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='算法题提交记录表';

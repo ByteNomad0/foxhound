@@ -60,3 +60,19 @@ export const deleteQuestion = (id) => request.delete(`/admin/questions/${id}`)
 
 export const getAiConfig = () => request.get('/admin/ai-config')
 export const saveAiConfig = (data) => request.put('/admin/ai-config', data)
+
+// ---------- 复试机试 ----------
+export const getCodingProblems = () => request.get('/coding/problems')
+export const getCodingProblem = (id) => request.get(`/coding/problems/${id}`)
+export const submitCode = (data) => request.post('/coding/submit', data)
+export const getCodingSubmissions = (params) => request.get('/coding/submissions', { params })
+
+// ---------- 后台：算法题管理 ----------
+export const getAdminCodingProblems = () => request.get('/admin/coding/problems')
+export const createCodingProblem = (data) => request.post('/admin/coding/problems', data)
+export const updateCodingProblem = (id, data) => request.put(`/admin/coding/problems/${id}`, data)
+export const deleteCodingProblem = (id) => request.delete(`/admin/coding/problems/${id}`)
+export const getAdminCodingTestCases = (problemId) => request.get('/admin/coding/test-cases', { params: { problemId } })
+export const createCodingTestCase = (data) => request.post('/admin/coding/test-cases', data)
+export const updateCodingTestCase = (id, data) => request.put(`/admin/coding/test-cases/${id}`, data)
+export const deleteCodingTestCase = (id) => request.delete(`/admin/coding/test-cases/${id}`)

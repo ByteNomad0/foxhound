@@ -16,4 +16,8 @@ public class DashboardVO {
     private Long answerCount;
 
     private Long aiChatCount;
+
+    private Long codingProblemCount;
+
+    private Long codingSubmissionCount;
 }

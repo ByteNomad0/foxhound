@@ -12,6 +12,8 @@ import com.kaoyan408.entity.Question;
 import com.kaoyan408.entity.User;
 import com.kaoyan408.mapper.AiChatRecordMapper;
 import com.kaoyan408.mapper.AnswerRecordMapper;
+import com.kaoyan408.mapper.CodingProblemMapper;
+import com.kaoyan408.mapper.CodingSubmissionMapper;
 import com.kaoyan408.mapper.CourseMapper;
 import com.kaoyan408.mapper.KnowledgePointMapper;
 import com.kaoyan408.mapper.QuestionMapper;
@@ -31,6 +33,8 @@ public class AdminService {
     private final QuestionMapper questionMapper;
     private final AnswerRecordMapper answerRecordMapper;
     private final AiChatRecordMapper aiChatRecordMapper;
+    private final CodingProblemMapper codingProblemMapper;
+    private final CodingSubmissionMapper codingSubmissionMapper;
 
     public PageResult<User> listUsers(int page, int size, String keyword) {
         LambdaQueryWrapper<User> w = new LambdaQueryWrapper<>();
@@ -76,6 +80,8 @@ public class AdminService {
         vo.setQuestionCount(questionMapper.selectCount(null));
         vo.setAnswerCount(answerRecordMapper.selectCount(null));
         vo.setAiChatCount(aiChatRecordMapper.selectCount(null));
+        vo.setCodingProblemCount(codingProblemMapper.selectCount(null));
+        vo.setCodingSubmissionCount(codingSubmissionMapper.selectCount(null));
         return vo;
     }
 

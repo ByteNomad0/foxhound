@@ -23,6 +23,8 @@ const routes = [
       { path: 'history', name: 'History', component: () => import('@/views/History.vue'), meta: { requiresAuth: true } },
       { path: 'stats', name: 'Stats', component: () => import('@/views/Stats.vue'), meta: { requiresAuth: true } },
       { path: 'ai', name: 'AiAssistant', component: () => import('@/views/AiAssistant.vue'), meta: { requiresAuth: true } },
+      { path: 'interview', name: 'Interview', component: () => import('@/views/Interview.vue') },
+      { path: 'interview/problem/:id', name: 'CodingProblem', component: () => import('@/views/CodingProblem.vue') },
       { path: 'profile', name: 'Profile', component: () => import('@/views/Profile.vue'), meta: { requiresAuth: true } }
     ]
   },
@@ -35,6 +37,7 @@ const routes = [
       { path: 'courses', name: 'CourseManage', component: () => import('@/views/admin/CourseManage.vue') },
       { path: 'knowledge-points', name: 'KnowledgePointManage', component: () => import('@/views/admin/KnowledgePointManage.vue') },
       { path: 'questions', name: 'QuestionManage', component: () => import('@/views/admin/QuestionManage.vue') },
+      { path: 'coding', name: 'CodingProblemManage', component: () => import('@/views/admin/CodingProblemManage.vue') },
       { path: 'users', name: 'UserManage', component: () => import('@/views/admin/UserManage.vue') },
       { path: 'ai-config', name: 'AiConfig', component: () => import('@/views/admin/AiConfig.vue') }
     ]

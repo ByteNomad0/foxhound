@@ -22,6 +22,10 @@
           <el-icon><Tickets /></el-icon>
           <span>题库管理</span>
         </el-menu-item>
+        <el-menu-item index="/admin/coding">
+          <el-icon><Cpu /></el-icon>
+          <span>算法题管理</span>
+        </el-menu-item>
         <el-menu-item index="/admin/users">
           <el-icon><User /></el-icon>
           <span>用户管理</span>

@@ -8,6 +8,7 @@
         </router-link>
         <el-menu mode="horizontal" :default-active="activeMenu" router class="nav" :ellipsis="false">
           <el-menu-item index="/">首页</el-menu-item>
+          <el-menu-item index="/interview">复试机试</el-menu-item>
           <el-menu-item index="/practice">刷题练习</el-menu-item>
           <el-menu-item index="/history">答题历史</el-menu-item>
           <el-menu-item index="/stats">学习统计</el-menu-item>
@@ -56,6 +57,7 @@ const store = useUserStore()
 
 const activeMenu = computed(() => {
   if (route.path.startsWith('/course') || route.path.startsWith('/knowledge-point')) return '/'
+  if (route.path.startsWith('/interview')) return '/interview'
   return route.path
 })
 
