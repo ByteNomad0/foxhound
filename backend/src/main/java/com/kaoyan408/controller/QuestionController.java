@@ -29,6 +29,12 @@ public class QuestionController {
         return Result.ok(questionService.practice(courseId, knowledgePointId, type, difficulty, count));
     }
 
+    /** 每日一题（公开，不含答案） */
+    @GetMapping("/daily")
+    public Result<QuestionVO> daily() {
+        return Result.ok(questionService.daily());
+    }
+
     @GetMapping("/{id}")
     public Result<QuestionVO> practiceDetail(@PathVariable Long id) {
         return Result.ok(questionService.getPracticeQuestion(id));

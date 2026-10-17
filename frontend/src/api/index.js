@@ -21,6 +21,7 @@ export const markStudied = (id) => request.post(`/knowledge-points/${id}/studied
 // ---------- 题库 / 答题 ----------
 export const getPracticeQuestions = (params) => request.get('/questions/practice', { params })
 export const getPracticeQuestion = (id) => request.get(`/questions/${id}`)
+export const getDailyQuestion = () => request.get('/questions/daily')
 export const submitAnswer = (data) => request.post('/answers/submit', data)
 export const getHistory = (params) => request.get('/answers/history', { params })
 
@@ -28,6 +29,7 @@ export const getHistory = (params) => request.get('/answers/history', { params }
 export const getStats = () => request.get('/study/stats')
 export const getWeakPoints = () => request.get('/study/weak-points')
 export const getStudiedIds = () => request.get('/study/studied-ids')
+export const getStudyCalendar = (year, month) => request.get('/study/calendar', { params: { year, month } })
 
 // ---------- AI ----------
 export const aiConfigStatus = () => request.get('/ai/config-status')

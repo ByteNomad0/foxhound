@@ -2,11 +2,13 @@ package com.kaoyan408.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.kaoyan408.dto.CourseAnswerStat;
+import com.kaoyan408.dto.DailyAnswerCount;
 import com.kaoyan408.entity.AnswerRecord;
 import com.kaoyan408.vo.WeakPointVO;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface AnswerRecordMapper extends BaseMapper<AnswerRecord> {
@@ -29,4 +31,13 @@ public interface AnswerRecordMapper extends BaseMapper<AnswerRecord> {
             "WHERE ar.user_id = #{userId} " +
             "GROUP BY q.course_id")
     List<CourseAnswerStat> selectStatsByCourse(@Param("userId") Long userId);
+
+    /** 按天统计答题数量（用于学习日历） */
+    @Select("SELECT DATE_FORMAT(submitted_at, '%Y-%m-%d') AS date, COUNT(*) AS cnt " +
+            "FROM answer_record " +
+            "WHERE user_id = #{userId} AND submitted_at >= #{start} AND submitted_at < #{end} " +
+            "GROUP BY DATE_FORMAT(submitted_at, '%Y-%m-%d')")
+    List<DailyAnswerCount> selectDailyCounts(@Param("userId") Long userId,
+                                             @Param("start") LocalDateTime start,
+                                             @Param("end") LocalDateTime end);
 }

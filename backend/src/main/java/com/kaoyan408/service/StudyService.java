@@ -2,6 +2,7 @@ package com.kaoyan408.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.kaoyan408.dto.CourseAnswerStat;
+import com.kaoyan408.dto.DailyAnswerCount;
 import com.kaoyan408.entity.AnswerRecord;
 import com.kaoyan408.entity.Course;
 import com.kaoyan408.entity.KnowledgePoint;
@@ -61,6 +62,13 @@ public class StudyService {
         return studyRecordMapper.selectList(new LambdaQueryWrapper<StudyRecord>()
                         .eq(StudyRecord::getUserId, userId))
                 .stream().map(StudyRecord::getKnowledgePointId).distinct().toList();
+    }
+
+    /** 学习日历：按月统计每天的答题数量 */
+    public List<DailyAnswerCount> calendar(Long userId, int year, int month) {
+        LocalDateTime start = LocalDateTime.of(year, month, 1, 0, 0, 0);
+        LocalDateTime end = start.plusMonths(1);
+        return answerRecordMapper.selectDailyCounts(userId, start, end);
     }
 
     /** 学习统计：正确率 + 学习进度 */

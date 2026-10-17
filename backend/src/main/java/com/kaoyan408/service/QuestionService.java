@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -57,6 +58,20 @@ public class QuestionService {
 
     public QuestionVO getPracticeQuestion(Long id) {
         return toVO(requireQuestion(id), false);
+    }
+
+    /** 每日一题：按日期确定性抽取一道题（不含答案） */
+    public QuestionVO daily() {
+        Long total = questionMapper.selectCount(new LambdaQueryWrapper<Question>().eq(Question::getStatus, 1));
+        if (total == null || total == 0) {
+            return null;
+        }
+        long offset = Math.floorMod(LocalDate.now().toEpochDay(), total);
+        List<Question> list = questionMapper.selectList(new LambdaQueryWrapper<Question>()
+                .eq(Question::getStatus, 1)
+                .orderByAsc(Question::getId)
+                .last("LIMIT 1 OFFSET " + offset));
+        return list.isEmpty() ? null : toVO(list.get(0), false);
     }
 
     /** 后台/复习：含答案与解析 */
