@@ -21,7 +21,7 @@
           <template #default="{ row }">{{ row.questionContent }}</template>
         </el-table-column>
         <el-table-column prop="courseName" label="课程" width="130" />
-        <el-table-column prop="knowledgePointTitle" label="知识点" width="150" show-overflow-tooltip />
+        <el-table-column v-if="!isMobile" prop="knowledgePointTitle" label="知识点" width="150" show-overflow-tooltip />
         <el-table-column label="题型" width="90">
           <template #default="{ row }">{{ typeLabel(row.questionType) }}</template>
         </el-table-column>
@@ -33,7 +33,7 @@
             <el-tag :type="row.isCorrect === 1 ? 'success' : 'danger'">{{ row.isCorrect === 1 ? '正确' : '错误' }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="submittedAt" label="时间" width="170" />
+        <el-table-column v-if="!isMobile" prop="submittedAt" label="时间" width="170" />
         <el-table-column label="操作" width="80" fixed="right">
           <template #default="{ row }">
             <el-button link type="primary" @click="openDetail(row)">查看</el-button>
@@ -45,7 +45,7 @@
         :page-size="query.size" :current-page="query.page" @current-change="load" />
     </el-card>
 
-    <el-dialog v-model="detailVisible" title="答题详情" width="640px">
+    <el-dialog v-model="detailVisible" title="答题详情" width="min(640px, 92%)">
       <div v-if="detail">
         <div class="detail-question">{{ detail.questionContent }}</div>
         <div class="detail-options">
@@ -66,8 +66,10 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { getHistory, getCourses } from '@/api'
+import { useIsMobile } from '@/composables/useMediaQuery'
 
 const courses = ref([])
+const isMobile = useIsMobile()
 const loading = ref(false)
 const records = ref([])
 const total = ref(0)
@@ -155,5 +157,15 @@ onMounted(async () => {
 .detail-line {
   margin-bottom: 8px;
   line-height: 1.7;
+}
+
+@media (max-width: 767px) {
+  :deep(.el-form--inline .el-form-item) {
+    display: block;
+    margin-right: 0;
+  }
+  :deep(.el-form--inline .el-select) {
+    width: 100% !important;
+  }
 }
 </style>

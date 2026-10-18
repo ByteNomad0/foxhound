@@ -33,6 +33,7 @@ export const getStudyCalendar = (year, month) => request.get('/study/calendar', 
 
 // ---------- AI ----------
 export const aiConfigStatus = () => request.get('/ai/config-status')
+export const getAiHistory = () => request.get('/ai/history')
 // 注意：AI 聊天与薄弱点分析为 SSE 流式接口，由 AiAssistant.vue 内使用 fetch 消费，不走 axios 拦截器
 
 // ---------- 后台管理 ----------

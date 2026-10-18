@@ -24,10 +24,10 @@
             <el-progress :percentage="row.progress || 0" :stroke-width="16" />
           </template>
         </el-table-column>
-        <el-table-column label="知识点" width="140">
+        <el-table-column v-if="!isMobile" label="知识点" width="140">
           <template #default="{ row }">{{ row.studiedKp }} / {{ row.totalKp }}</template>
         </el-table-column>
-        <el-table-column label="答题" width="140">
+        <el-table-column v-if="!isMobile" label="答题" width="140">
           <template #default="{ row }">{{ row.answeredCount }} 题</template>
         </el-table-column>
         <el-table-column label="正确率" width="120">
@@ -47,8 +47,8 @@
       <el-table v-else :data="weakPoints" border stripe>
         <el-table-column prop="courseName" label="课程" width="160" />
         <el-table-column prop="knowledgePointTitle" label="知识点" min-width="200" />
-        <el-table-column prop="total" label="答题数" width="100" />
-        <el-table-column prop="correct" label="答对" width="100" />
+        <el-table-column v-if="!isMobile" prop="total" label="答题数" width="100" />
+        <el-table-column v-if="!isMobile" prop="correct" label="答对" width="100" />
         <el-table-column label="正确率" width="200">
           <template #default="{ row }">
             <el-progress :percentage="row.accuracy" :status="row.accuracy < 60 ? 'exception' : ''" />
@@ -62,8 +62,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { getStats, getWeakPoints } from '@/api'
+import { useIsMobile } from '@/composables/useMediaQuery'
 
 const loading = ref(false)
+const isMobile = useIsMobile()
 const stats = ref({})
 const weakPoints = ref([])
 
@@ -118,6 +120,8 @@ onMounted(async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .rate.good {
@@ -133,5 +137,11 @@ onMounted(async () => {
 .rate.bad {
   color: #f56c6c;
   font-weight: 700;
+}
+
+@media (max-width: 767px) {
+  .stat-num {
+    font-size: 24px;
+  }
 }
 </style>

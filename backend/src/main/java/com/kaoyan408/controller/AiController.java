@@ -1,9 +1,12 @@
 package com.kaoyan408.controller;
 
+import java.util.List;
+
 import com.kaoyan408.common.Result;
 import com.kaoyan408.dto.AiChatDTO;
 import com.kaoyan408.security.SecurityUtil;
 import com.kaoyan408.service.AiService;
+import com.kaoyan408.vo.AiChatRecordVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -37,5 +40,11 @@ public class AiController {
     @PostMapping(value = "/weak-point-analysis", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter weakPointAnalysis() {
         return aiService.weakPointAnalysisStream(SecurityUtil.getUserId());
+    }
+
+    /** 查询当前用户的历史对话（用于前端回显） */
+    @GetMapping("/history")
+    public Result<List<AiChatRecordVO>> history() {
+        return Result.ok(aiService.history(SecurityUtil.getUserId()));
     }
 }

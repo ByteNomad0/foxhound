@@ -84,4 +84,10 @@ onMounted(async () => {
 .config-form {
   max-width: 640px;
 }
+
+@media (max-width: 767px) {
+  .config-form :deep(.el-select) {
+    width: 100% !important;
+  }
+}
 </style>

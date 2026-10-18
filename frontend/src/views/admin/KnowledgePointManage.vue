@@ -18,10 +18,10 @@
           <el-tag :type="row.parentId === 0 ? 'primary' : 'info'" size="small">{{ row.parentId === 0 ? '章节' : '知识点' }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="所属章节" width="180">
+      <el-table-column v-if="!isMobile" label="所属章节" width="180">
         <template #default="{ row }">{{ parentTitle(row.parentId) }}</template>
       </el-table-column>
-      <el-table-column prop="sort" label="排序" width="70" />
+      <el-table-column v-if="!isMobile" prop="sort" label="排序" width="70" />
       <el-table-column label="操作" width="140" fixed="right">
         <template #default="{ row }">
           <el-button link type="primary" @click="openEdit(row)">编辑</el-button>
@@ -30,7 +30,7 @@
       </el-table-column>
     </el-table>
 
-    <el-dialog v-model="dialogVisible" :title="form.id ? '编辑知识点' : '新增知识点'" width="700px">
+    <el-dialog v-model="dialogVisible" :title="form.id ? '编辑知识点' : '新增知识点'" width="min(700px, 92%)">
       <el-form :model="form" :rules="rules" ref="formRef" label-width="90px">
         <el-form-item label="标题" prop="title">
           <el-input v-model="form.title" />
@@ -65,8 +65,10 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getAdminCourses, getAdminKnowledgePoints, createKnowledgePoint, updateKnowledgePoint, deleteKnowledgePoint } from '@/api'
+import { useIsMobile } from '@/composables/useMediaQuery'
 
 const courses = ref([])
+const isMobile = useIsMobile()
 const courseId = ref(null)
 const kps = ref([])
 const loading = ref(false)
@@ -153,6 +155,8 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .page-title {
@@ -162,5 +166,6 @@ onMounted(async () => {
 .toolbar-right {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 </style>

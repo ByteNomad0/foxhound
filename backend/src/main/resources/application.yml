@@ -28,3 +28,11 @@ jwt:
   secret: kaoyan408-jwt-secret-key-please-change-in-production-2026
   # 过期时间（毫秒），默认 24 小时
   expiration: 86400000
+
+# AI 助手历史记忆（可调，越大记忆越长，但不要超过所接模型的最大上下文）
+ai:
+  history:
+    # 最多携带的历史消息条数（1 问 1 答算 2 条）
+    max-messages: 120
+    # 历史消息总字符数上限，超过后从最早的消息开始丢弃
+    max-chars: 16000

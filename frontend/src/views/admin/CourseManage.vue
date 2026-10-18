@@ -8,10 +8,10 @@
     <el-table :data="courses" v-loading="loading" border stripe>
       <el-table-column prop="id" label="ID" width="70" />
       <el-table-column prop="name" label="课程名称" width="180" />
-      <el-table-column prop="code" label="代码" width="100" />
-      <el-table-column prop="subject" label="学科" width="140" />
+      <el-table-column v-if="!isMobile" prop="code" label="代码" width="100" />
+      <el-table-column v-if="!isMobile" prop="subject" label="学科" width="140" />
       <el-table-column prop="description" label="描述" min-width="200" show-overflow-tooltip />
-      <el-table-column prop="sort" label="排序" width="70" />
+      <el-table-column v-if="!isMobile" prop="sort" label="排序" width="70" />
       <el-table-column label="状态" width="80">
         <template #default="{ row }">
           <el-tag :type="row.status === 1 ? 'success' : 'info'">{{ row.status === 1 ? '启用' : '禁用' }}</el-tag>
@@ -25,7 +25,7 @@
       </el-table-column>
     </el-table>
 
-    <el-dialog v-model="dialogVisible" :title="form.id ? '编辑课程' : '新增课程'" width="560px">
+    <el-dialog v-model="dialogVisible" :title="form.id ? '编辑课程' : '新增课程'" width="min(560px, 92%)">
       <el-form :model="form" :rules="rules" ref="formRef" label-width="80px">
         <el-form-item label="名称" prop="name">
           <el-input v-model="form.name" />
@@ -61,8 +61,10 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getAdminCourses, createCourse, updateCourse, deleteCourse } from '@/api'
+import { useIsMobile } from '@/composables/useMediaQuery'
 
 const courses = ref([])
+const isMobile = useIsMobile()
 const loading = ref(false)
 const saving = ref(false)
 const dialogVisible = ref(false)
@@ -131,6 +133,8 @@ onMounted(load)
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .page-title {

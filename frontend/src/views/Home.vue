@@ -2,14 +2,22 @@
   <div class="home">
     <!-- 1. 主横幅 -->
     <div class="banner">
-      <h1>408 计算机学科考研学习平台</h1>
-      <p>系统学习 · 刷题巩固 · 数据分析 · AI 辅导，一站式备战计算机统考</p>
-      <div class="subject-tags">
-        <el-tag v-for="s in subjectTags" :key="s" effect="dark" size="large" class="subject-tag">{{ s }}</el-tag>
-      </div>
-      <div class="banner-actions">
-        <el-button type="primary" size="large" @click="$router.push('/practice')">开始刷题</el-button>
-        <el-button v-if="!store.isLogin" size="large" class="ghost-btn" @click="$router.push('/register')">免费注册</el-button>
+      <div class="banner-content">
+        <h1>408 计算机学科考研学习平台</h1>
+        <p>系统学习 · 刷题巩固 · 数据分析 · AI 辅导，一站式备战计算机统考</p>
+        <div class="subject-tags">
+          <el-tag v-for="s in subjectTags" :key="s" effect="dark" size="large" class="subject-tag">{{ s }}</el-tag>
+        </div>
+        <div class="banner-actions">
+          <el-button type="primary" size="large" @click="$router.push('/practice')">开始刷题</el-button>
+          <el-button v-if="!store.isLogin" size="large" class="ghost-btn" @click="$router.push('/register')">免费注册</el-button>
+        </div>
+        <div class="banner-highlights">
+          <div v-for="h in highlights" :key="h.title" class="hl-item">
+            <el-icon><component :is="h.icon" /></el-icon>
+            <span>{{ h.title }}</span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -30,6 +38,15 @@
         </el-card>
       </el-col>
     </el-row>
+
+    <!-- 未登录引导 -->
+    <div v-if="!store.isLogin" class="guest-cta">
+      <div class="guest-cta-text">
+        <span class="guest-cta-title">登录后解锁完整学习体验</span>
+        <span class="guest-cta-desc">学习日历 · 正确率统计 · 答题历史 · 薄弱点 AI 分析</span>
+      </div>
+      <el-button type="primary" round @click="$router.push('/login')">立即登录</el-button>
+    </div>
 
     <!-- 3. 学习概览（登录后） -->
     <template v-if="store.isLogin">
@@ -132,6 +149,13 @@ const colorOf = (id) => colors[(id - 1) % colors.length]
 
 const subjectTags = ['数据结构', '计算机组成原理', '操作系统', '计算机网络']
 
+const highlights = [
+  { icon: 'Collection', title: '四门核心科目' },
+  { icon: 'EditPen', title: '单选 / 多选 / 判断' },
+  { icon: 'MagicStick', title: 'AI 智能答疑' },
+  { icon: 'DataAnalysis', title: '学习数据分析' }
+]
+
 const examSubjects = [
   { name: '数据结构', score: 45, desc: '线性表 · 树 · 图 · 查找 · 排序' },
   { name: '计算机组成原理', score: 45, desc: '数据表示 · 存储系统 · 指令系统 · CPU' },
@@ -185,21 +209,52 @@ onMounted(async () => {
 
 /* 横幅 */
 .banner {
-  background: linear-gradient(135deg, #409eff 0%, #2f54eb 100%);
-  border-radius: 12px;
-  padding: 48px 40px;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1e4fd8 0%, #409eff 55%, #6fb3ff 100%);
+  border-radius: 14px;
+  padding: 48px 44px;
   color: #fff;
   margin-bottom: 30px;
 }
 
+.banner::before {
+  content: '';
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  top: -120px;
+  right: -60px;
+}
+
+.banner::after {
+  content: '';
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  bottom: -90px;
+  right: 180px;
+}
+
+.banner-content {
+  position: relative;
+  z-index: 1;
+}
+
 .banner h1 {
-  font-size: 28px;
+  font-size: 30px;
   margin-bottom: 12px;
+  letter-spacing: 1px;
 }
 
 .banner p {
   margin-bottom: 18px;
   opacity: 0.92;
+  font-size: 15px;
 }
 
 .subject-tags {
@@ -223,10 +278,70 @@ onMounted(async () => {
   background: transparent;
 }
 
+.banner-highlights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 26px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.hl-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  opacity: 0.95;
+}
+
 /* 通用标题 */
 .section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 20px;
-  margin: 28px 0 16px;
+  font-weight: 700;
+  margin: 32px 0 16px;
+  color: #303133;
+}
+
+.section-title::before {
+  content: '';
+  width: 4px;
+  height: 20px;
+  border-radius: 2px;
+  background: #409eff;
+}
+
+/* 未登录引导条 */
+.guest-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 4px 0 8px;
+  padding: 18px 24px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #ecf5ff 0%, #f0f9ff 100%);
+  border: 1px solid #d9ecff;
+}
+
+.guest-cta-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.guest-cta-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #303133;
+}
+
+.guest-cta-desc {
+  font-size: 13px;
+  color: #909399;
 }
 
 /* 快捷入口 */
@@ -234,6 +349,11 @@ onMounted(async () => {
   cursor: pointer;
   text-align: center;
   margin-bottom: 16px;
+  transition: transform 0.25s ease;
+}
+
+.quick-card:hover {
+  transform: translateY(-4px);
 }
 
 .quick-icon {
@@ -245,6 +365,11 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: transform 0.25s ease;
+}
+
+.quick-card:hover .quick-icon {
+  transform: scale(1.06);
 }
 
 .quick-title {
@@ -318,6 +443,8 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .weak-tip {
@@ -346,12 +473,16 @@ onMounted(async () => {
 .weak-info {
   display: flex;
   flex-direction: column;
-  min-width: 200px;
+  flex: 1;
+  min-width: 0;
 }
 
 .weak-kp {
   font-weight: 600;
   font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .weak-course {
@@ -361,6 +492,7 @@ onMounted(async () => {
 
 .weak-progress {
   flex: 1;
+  min-width: 80px;
 }
 
 /* 课程卡片 */
@@ -368,6 +500,11 @@ onMounted(async () => {
   cursor: pointer;
   margin-bottom: 20px;
   text-align: center;
+  transition: transform 0.25s ease;
+}
+
+.course-card:hover {
+  transform: translateY(-4px);
 }
 
 .course-icon {
@@ -413,6 +550,11 @@ onMounted(async () => {
 .subject-card {
   text-align: center;
   margin-bottom: 20px;
+  transition: transform 0.25s ease;
+}
+
+.subject-card:hover {
+  transform: translateY(-4px);
 }
 
 .subject-score {
@@ -437,5 +579,59 @@ onMounted(async () => {
   font-size: 13px;
   color: #909399;
   line-height: 1.6;
+}
+
+/* 移动端 */
+@media (max-width: 767px) {
+  .banner {
+    padding: 28px 20px;
+    margin-bottom: 24px;
+  }
+
+  .banner h1 {
+    font-size: 22px;
+  }
+
+  .banner p {
+    font-size: 14px;
+  }
+
+  .banner-highlights {
+    gap: 12px;
+  }
+
+  .hl-item {
+    font-size: 12px;
+  }
+
+  .section-title {
+    font-size: 18px;
+    margin-top: 24px;
+  }
+
+  .guest-cta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .stat-num {
+    font-size: 22px;
+  }
+
+  .weak-item {
+    flex-wrap: wrap;
+  }
+
+  .weak-info {
+    flex: 1 1 100%;
+  }
+
+  .weak-progress {
+    flex: 1 1 100%;
+  }
+
+  .subject-score {
+    font-size: 26px;
+  }
 }
 </style>

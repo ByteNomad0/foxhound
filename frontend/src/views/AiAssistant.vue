@@ -41,7 +41,7 @@
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { aiConfigStatus } from '@/api'
+import { aiConfigStatus, getAiHistory } from '@/api'
 
 const route = useRoute()
 const configured = ref(false)
@@ -234,6 +234,17 @@ const onWeakPoint = async () => {
   }
 }
 
+const loadHistory = async () => {
+  try {
+    const res = await getAiHistory()
+    const list = res.data || []
+    messages.value = list.map((r) => ({ role: r.role, content: r.content }))
+    await scrollToBottom()
+  } catch (e) {
+    // 历史加载失败不影响正常使用
+  }
+}
+
 onMounted(async () => {
   try {
     const res = await aiConfigStatus()
@@ -241,6 +252,7 @@ onMounted(async () => {
   } catch (e) {
     configured.value = false
   }
+  await loadHistory()
 })
 </script>
 
@@ -253,6 +265,7 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   height: calc(100vh - 160px);
+  min-height: 400px;
 }
 
 .chat-header {
@@ -340,10 +353,31 @@ onMounted(async () => {
   align-items: flex-end;
   padding-top: 12px;
   border-top: 1px solid #ebeef5;
+  flex-wrap: wrap;
+}
+
+.chat-input :deep(.el-textarea) {
+  flex: 1;
+  min-width: 200px;
 }
 
 .chat-input .el-button {
   height: 56px;
   padding: 0 24px;
+}
+
+@media (max-width: 767px) {
+  .chat-card {
+    height: calc(100vh - 140px);
+  }
+
+  .chat-input :deep(.el-textarea) {
+    flex: 1 1 100%;
+  }
+
+  .chat-input .el-button {
+    height: 44px;
+    padding: 0 16px;
+  }
 }
 </style>

@@ -306,4 +306,15 @@ onMounted(async () => {
   line-height: 1.8;
   color: #606266;
 }
+
+@media (max-width: 767px) {
+  :deep(.el-form--inline .el-form-item) {
+    display: block;
+    margin-right: 0;
+  }
+  :deep(.el-form--inline .el-select),
+  :deep(.el-form--inline .el-input-number) {
+    width: 100% !important;
+  }
+}
 </style>

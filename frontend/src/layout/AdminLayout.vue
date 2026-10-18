@@ -1,44 +1,24 @@
 <template>
   <el-container class="admin-layout">
-    <el-aside width="220px" class="aside">
+    <el-aside v-if="!isNarrow" width="220px" class="aside">
       <div class="logo">
         <el-icon size="22"><Setting /></el-icon>
         <span>后台管理</span>
       </div>
       <el-menu :default-active="activeMenu" router background-color="#001529" text-color="#bfcbd9" active-text-color="#409eff">
-        <el-menu-item index="/admin">
-          <el-icon><DataAnalysis /></el-icon>
-          <span>数据看板</span>
-        </el-menu-item>
-        <el-menu-item index="/admin/courses">
-          <el-icon><Collection /></el-icon>
-          <span>课程管理</span>
-        </el-menu-item>
-        <el-menu-item index="/admin/knowledge-points">
-          <el-icon><Document /></el-icon>
-          <span>知识点管理</span>
-        </el-menu-item>
-        <el-menu-item index="/admin/questions">
-          <el-icon><Tickets /></el-icon>
-          <span>题库管理</span>
-        </el-menu-item>
-        <el-menu-item index="/admin/coding">
-          <el-icon><Cpu /></el-icon>
-          <span>算法题管理</span>
-        </el-menu-item>
-        <el-menu-item index="/admin/users">
-          <el-icon><User /></el-icon>
-          <span>用户管理</span>
-        </el-menu-item>
-        <el-menu-item index="/admin/ai-config">
-          <el-icon><MagicStick /></el-icon>
-          <span>AI 配置</span>
+        <el-menu-item v-for="m in menuItems" :key="m.path" :index="m.path">
+          <el-icon><component :is="m.icon" /></el-icon>
+          <span>{{ m.title }}</span>
         </el-menu-item>
       </el-menu>
     </el-aside>
+
     <el-container>
       <el-header class="header">
-        <div>
+        <div class="header-left">
+          <el-button v-if="isNarrow" text class="menu-btn" @click="drawer = true">
+            <el-icon size="20"><Menu /></el-icon>
+          </el-button>
           <el-button text @click="$router.push('/')">
             <el-icon><Back /></el-icon>&nbsp;返回前台
           </el-button>
@@ -52,17 +32,45 @@
         <router-view />
       </el-main>
     </el-container>
+
+    <el-drawer v-model="drawer" direction="ltr" size="240px" :with-header="false" class="admin-drawer">
+      <div class="drawer-menu">
+        <div class="logo">
+          <el-icon size="22"><Setting /></el-icon>
+          <span>后台管理</span>
+        </div>
+        <el-menu :default-active="activeMenu" router background-color="#001529" text-color="#bfcbd9" active-text-color="#409eff" @select="drawer = false">
+          <el-menu-item v-for="m in menuItems" :key="m.path" :index="m.path">
+            <el-icon><component :is="m.icon" /></el-icon>
+            <span>{{ m.title }}</span>
+          </el-menu-item>
+        </el-menu>
+      </div>
+    </el-drawer>
   </el-container>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/store/user'
+import { useIsNarrow } from '@/composables/useMediaQuery'
 
 const route = useRoute()
 const router = useRouter()
 const store = useUserStore()
+const isNarrow = useIsNarrow()
+const drawer = ref(false)
+
+const menuItems = [
+  { path: '/admin', icon: 'DataAnalysis', title: '数据看板' },
+  { path: '/admin/courses', icon: 'Collection', title: '课程管理' },
+  { path: '/admin/knowledge-points', icon: 'Document', title: '知识点管理' },
+  { path: '/admin/questions', icon: 'Tickets', title: '题库管理' },
+  { path: '/admin/coding', icon: 'Cpu', title: '算法题管理' },
+  { path: '/admin/users', icon: 'User', title: '用户管理' },
+  { path: '/admin/ai-config', icon: 'MagicStick', title: 'AI 配置' }
+]
 
 const activeMenu = computed(() => route.path)
 
@@ -93,7 +101,8 @@ const onLogout = () => {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.aside .el-menu {
+.aside .el-menu,
+.drawer-menu .el-menu {
   border-right: none;
 }
 
@@ -103,6 +112,16 @@ const onLogout = () => {
   align-items: center;
   justify-content: space-between;
   box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.menu-btn {
+  padding: 8px;
 }
 
 .right {
@@ -119,5 +138,21 @@ const onLogout = () => {
 .main {
   background: #f5f7fa;
   padding: 20px;
+}
+
+/* 抽屉版侧栏 */
+.admin-drawer :deep(.el-drawer__body) {
+  padding: 0;
+}
+
+.drawer-menu {
+  background: #001529;
+  min-height: 100%;
+}
+
+@media (max-width: 899px) {
+  .main {
+    padding: 12px;
+  }
 }
 </style>

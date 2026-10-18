@@ -49,6 +49,12 @@ onMounted(async () => {
   font-weight: 700;
 }
 
+@media (max-width: 767px) {
+  .stat-num {
+    font-size: 24px;
+  }
+}
+
 .stat-label {
   margin-top: 8px;
   color: #909399;

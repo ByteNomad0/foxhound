@@ -10,8 +10,8 @@
     <el-table :data="users" v-loading="loading" border stripe>
       <el-table-column prop="id" label="ID" width="70" />
       <el-table-column prop="username" label="用户名" width="140" />
-      <el-table-column prop="nickname" label="昵称" width="140" />
-      <el-table-column prop="email" label="邮箱" min-width="180" show-overflow-tooltip />
+      <el-table-column v-if="!isMobile" prop="nickname" label="昵称" width="140" />
+      <el-table-column v-if="!isMobile" prop="email" label="邮箱" min-width="180" show-overflow-tooltip />
       <el-table-column label="角色" width="100">
         <template #default="{ row }">
           <el-tag :type="row.role === 'ADMIN' ? 'danger' : 'info'">{{ row.role === 'ADMIN' ? '管理员' : '用户' }}</el-tag>
@@ -22,8 +22,8 @@
           <el-tag :type="row.status === 1 ? 'success' : 'danger'">{{ row.status === 1 ? '启用' : '禁用' }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="createdAt" label="注册时间" width="170" />
-      <el-table-column label="操作" width="220" fixed="right">
+      <el-table-column v-if="!isMobile" prop="createdAt" label="注册时间" width="170" />
+      <el-table-column label="操作" width="160" fixed="right">
         <template #default="{ row }">
           <el-button v-if="row.username !== 'admin'" link :type="row.role === 'ADMIN' ? 'warning' : 'primary'" @click="onToggleRole(row)">
             {{ row.role === 'ADMIN' ? '设为用户' : '设为管理员' }}
@@ -45,8 +45,10 @@
 import { ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getUsers, updateUserRole, updateUserStatus, deleteUser } from '@/api'
+import { useIsMobile } from '@/composables/useMediaQuery'
 
 const users = ref([])
+const isMobile = useIsMobile()
 const total = ref(0)
 const page = ref(1)
 const size = 10
@@ -95,6 +97,8 @@ onMounted(() => load(1))
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .page-title {

@@ -85,6 +85,19 @@ onMounted(async () => {
   color: #303133;
   font-size: 15px;
   white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.content :deep(img) {
+  max-width: 100%;
+  height: auto;
+}
+
+.content :deep(table) {
+  max-width: 100%;
+  display: block;
+  overflow-x: auto;
 }
 
 .content.key {

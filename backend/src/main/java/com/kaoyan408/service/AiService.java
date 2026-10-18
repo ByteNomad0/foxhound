@@ -1,5 +1,6 @@
 package com.kaoyan408.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,11 +15,13 @@ import com.kaoyan408.mapper.AiChatRecordMapper;
 import com.kaoyan408.mapper.AiConfigMapper;
 import com.kaoyan408.mapper.CourseMapper;
 import com.kaoyan408.mapper.KnowledgePointMapper;
+import com.kaoyan408.vo.AiChatRecordVO;
 import com.kaoyan408.vo.WeakPointVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -35,6 +38,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +67,14 @@ public class AiService {
     @Autowired
     @Qualifier("aiExecutor")
     private ThreadPoolTaskExecutor aiExecutor;
+
+    /** 历史记忆：最多携带的消息条数（1 问 1 答算 2 条） */
+    @Value("${ai.history.max-messages:120}")
+    private int maxHistoryMessages;
+
+    /** 历史记忆：历史消息总字符数上限，超过后从最早的消息开始丢弃 */
+    @Value("${ai.history.max-chars:16000}")
+    private int maxHistoryChars;
 
     // ---------------- 配置 ----------------
 
@@ -105,7 +117,7 @@ public class AiService {
     public SseEmitter chatStream(Long userId, AiChatDTO dto) {
         AiConfig c = requireConfig();
         String userMsg = buildUserMessage(dto);
-        List<Map<String, String>> messages = buildMessages(c, userMsg);
+        List<Map<String, String>> messages = buildMessages(c, userId, userMsg);
         return stream(userId, dto.getMessage(), c, messages);
     }
 
@@ -127,8 +139,30 @@ public class AiService {
                     .append(" 题，正确率 ").append(w.getAccuracy()).append("%\n");
         }
         sb.append("\n请分析我的薄弱环节，并给出针对性的复习建议和重点突破方向。");
-        List<Map<String, String>> messages = buildMessages(c, sb.toString());
+        List<Map<String, String>> messages = buildMessages(c, userId, sb.toString());
         return stream(userId, "[薄弱点分析请求]", c, messages);
+    }
+
+    /** 查询用户的历史对话（时间正序，用于前端回显） */
+    public List<AiChatRecordVO> history(Long userId) {
+        if (userId == null) {
+            return List.of();
+        }
+        List<AiChatRecord> list = aiChatRecordMapper.selectList(
+                new LambdaQueryWrapper<AiChatRecord>()
+                        .eq(AiChatRecord::getUserId, userId)
+                        .orderByDesc(AiChatRecord::getId)
+                        .last("LIMIT 100"));
+        Collections.reverse(list);
+        List<AiChatRecordVO> result = new ArrayList<>();
+        for (AiChatRecord r : list) {
+            AiChatRecordVO vo = new AiChatRecordVO();
+            vo.setRole(r.getRole());
+            vo.setContent(r.getContent());
+            vo.setCreatedAt(r.getCreatedAt());
+            result.add(vo);
+        }
+        return result;
     }
 
     // ---------------- 内部实现 ----------------
@@ -262,11 +296,48 @@ public class AiService {
         return userMsg;
     }
 
-    private List<Map<String, String>> buildMessages(AiConfig c, String userMsg) {
+    private List<Map<String, String>> buildMessages(AiConfig c, Long userId, String userMsg) {
         List<Map<String, String>> messages = new ArrayList<>();
         messages.add(Map.of("role", "system", "content", systemPrompt(c)));
+        // 携带历史对话，让模型具备上下文记忆
+        for (AiChatRecord r : loadHistory(userId)) {
+            messages.add(Map.of("role", r.getRole(), "content", r.getContent()));
+        }
         messages.add(Map.of("role", "user", "content", userMsg));
         return messages;
+    }
+
+    /** 按用户拉取最近的历史对话（时间正序，并做字符数裁剪） */
+    private List<AiChatRecord> loadHistory(Long userId) {
+        if (userId == null || maxHistoryMessages <= 0) {
+            return List.of();
+        }
+        List<AiChatRecord> list = aiChatRecordMapper.selectList(
+                new LambdaQueryWrapper<AiChatRecord>()
+                        .eq(AiChatRecord::getUserId, userId)
+                        .orderByDesc(AiChatRecord::getId)
+                        .last("LIMIT " + maxHistoryMessages));
+        Collections.reverse(list); // 倒序查询后反转为「旧 -> 新」
+        list.removeIf(r -> r.getRole() == null || r.getContent() == null);
+        return trimByBudget(list);
+    }
+
+    /** 历史总字符数超限时，从最早的消息开始丢弃，尽量保留最近的内容 */
+    private List<AiChatRecord> trimByBudget(List<AiChatRecord> list) {
+        int total = 0;
+        for (AiChatRecord r : list) {
+            total += length(r.getContent());
+        }
+        int drop = 0;
+        while (list.size() - drop > 2 && total > maxHistoryChars) {
+            total -= length(list.get(drop).getContent());
+            drop++;
+        }
+        return drop == 0 ? list : new ArrayList<>(list.subList(drop, list.size()));
+    }
+
+    private int length(String s) {
+        return s == null ? 0 : s.length();
     }
 
     private AiConfig getConfigEntity() {

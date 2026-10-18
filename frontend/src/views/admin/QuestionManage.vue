@@ -34,12 +34,12 @@
         </template>
       </el-table-column>
       <el-table-column prop="content" label="题干" min-width="260" show-overflow-tooltip />
-      <el-table-column prop="courseName" label="课程" width="130" show-overflow-tooltip />
-      <el-table-column prop="knowledgePointTitle" label="知识点" width="140" show-overflow-tooltip />
+      <el-table-column v-if="!isMobile" prop="courseName" label="课程" width="130" show-overflow-tooltip />
+      <el-table-column v-if="!isMobile" prop="knowledgePointTitle" label="知识点" width="140" show-overflow-tooltip />
       <el-table-column label="答案" width="90">
         <template #default="{ row }">{{ (row.answer || []).join('、') }}</template>
       </el-table-column>
-      <el-table-column label="难度" width="70">
+      <el-table-column v-if="!isMobile" label="难度" width="70">
         <template #default="{ row }">{{ row.difficulty }}</template>
       </el-table-column>
       <el-table-column label="操作" width="140" fixed="right">
@@ -53,7 +53,7 @@
     <el-pagination class="pagination" background layout="total, prev, pager, next" :total="total"
       :page-size="query.size" :current-page="query.page" @current-change="load" />
 
-    <el-dialog v-model="dialogVisible" :title="form.id ? '编辑题目' : '新增题目'" width="720px" top="5vh">
+    <el-dialog v-model="dialogVisible" :title="form.id ? '编辑题目' : '新增题目'" width="min(720px, 92%)" top="5vh">
       <el-form :model="form" :rules="rules" ref="formRef" label-width="90px">
         <el-form-item label="课程" prop="courseId">
           <el-select v-model="form.courseId" placeholder="选择课程" style="width: 100%" @change="onCourseChange">
@@ -122,8 +122,10 @@ import {
   getAdminCourses, getAdminKnowledgePoints, getAdminQuestions, getAdminQuestion,
   createQuestion, updateQuestion, deleteQuestion
 } from '@/api'
+import { useIsMobile } from '@/composables/useMediaQuery'
 
 const courses = ref([])
+const isMobile = useIsMobile()
 const kpOptions = ref([])
 const questions = ref([])
 const total = ref(0)
@@ -301,5 +303,16 @@ onMounted(async () => {
 .opt-key {
   font-weight: 700;
   min-width: 24px;
+}
+
+@media (max-width: 767px) {
+  :deep(.el-form--inline .el-form-item) {
+    display: block;
+    margin-right: 0;
+  }
+  :deep(.el-form--inline .el-select),
+  :deep(.el-form--inline .el-input) {
+    width: 100% !important;
+  }
 }
 </style>
